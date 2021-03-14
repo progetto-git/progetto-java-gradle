@@ -12,10 +12,13 @@ plugins {
 
     // add support for generating project's reports.
     id 'project-report'
+
+    // add support for spotbugs
+    id "com.github.spotbugs" version "4.7.0"
 }
 
 // all the tasks to execute by default. Try ./gradle run --dry-run
-defaultTasks 'clean', 'compileJava', 'jar', 'assemble', 'compileTestJava', 'test', 'build', 'javadoc', 'projectReport', 'run'
+defaultTasks 'clean', 'compileJava', 'jar', 'assemble', 'compileTestJava', 'test', 'build', 'check', 'javadoc', 'projectReport', 'run'
 
 repositories {
     // Use jcenter for resolving dependencies.
@@ -35,14 +38,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-
 jar {
     manifest {
         attributes('Implementation-Title': project.name,
                    'Implementation-Version': project.version)
     }
 }
-
 
 javadoc {
     failOnError = true // doesn't work ?? use Xerror flag instead
@@ -59,6 +60,23 @@ javadoc {
 
     // set this offline link, if you want to see the API offline by a local directory
     options.linksOffline("file:///usr/share/doc/openjdk-11-doc/api/", "/usr/share/doc/openjdk-11-doc/api/")
+}
+
+spotbugs {
+    effort = 'max' // min (low-precision), less, more (default), max
+    reportLevel = 'low' // low (all), medium (default), high
+    jvmArgs = [ '-Xms512m' ]
+    maxHeapSize = '768m'
+}
+
+// To configure Spotbugs HTML report
+spotbugsMain {
+    reports {
+        html {
+            enabled = true
+            destination = file("$buildDir/reports/spotbugs/main/spotbugs.html")
+        }
+    }
 }
 
 application {
